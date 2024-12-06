@@ -6,7 +6,6 @@
 <h2>Список заказов</h2>
 
 <a href="{{ url_for('new_order') }}" class="btn btn-primary">Добавить новый заказ</a>
-<a href="{{ url_for('statistics') }}" class="btn btn-info">Посмотреть статистику</a>
 
 <table class="table">
    <thead>
@@ -15,6 +14,8 @@
            <th>ID пользователя</th>
            <th>Дата заказа</th>
            <th>Статус</th>
+           <th>Товар</th>
+           <th>Поставщик</th>
            <th>Действия</th>
        </tr>
    </thead>
@@ -25,7 +26,12 @@
                <td>{{ order.user_id }}</td>
                <td>{{ order.order_date }}</td>
                <td>{{ order.status }}</td>
-               <td><a href="{{ url_for('edit_order', order_id=order.id) }}" class="btn btn-warning">Редактировать</a></td>
+               <td>{{ order.item.name }}</td>  <!-- Название товара -->
+               <td>{{ order.supplier.name }}</td>  <!-- Имя поставщика -->
+               <td>
+                   <a href="{{ url_for('edit_order', order_id=order.id) }}" class="btn btn-warning">Редактировать</a>
+                   <!-- Здесь можно добавить кнопку для удаления заказа -->
+               </td>
            </tr>
        {% endfor %}
    </tbody>

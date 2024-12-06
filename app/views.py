@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import abort, render_template, redirect, url_for, flash, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from app import app, db
 from app.forms import OrderForm, RegistrationForm, LoginForm, InventoryItemForm, SupplierForm
@@ -165,8 +165,9 @@ def new_inventory_item():
 @app.route('/suppliers')
 @login_required
 def suppliers():
+    form = SupplierForm()
     suppliers = Supplier.query.all()
-    return render_template('suppliers.html', suppliers=suppliers)
+    return render_template('suppliers.html', suppliers=suppliers, form=form)
 
 # Маршрут для добавления нового поставщика
 @app.route('/suppliers/new', methods=['GET', 'POST'])
@@ -203,7 +204,9 @@ def new_order():
         order = Order(
             user_id=form.user_id.data,
             order_date=order_date,
-            status=form.status.data
+            status=form.status.data,
+            item_id=form.item_id.data.id,  # Получаем ID выбранного товара
+            supplier_id=form.supplier_id.data.id  # Получаем ID выбранного поставщика
         )
         db.session.add(order)
         db.session.commit()
@@ -221,6 +224,8 @@ def edit_order(order_id):
         order.user_id = form.user_id.data
         order.order_date = form.order_date.data
         order.status = form.status.data
+        order.supplier_id = form.supplier_id.data
+        order.item_id = form.item_id.data
         db.session.commit()
         flash('Заказ обновлен!', 'success')
         return redirect(url_for('orders'))
@@ -251,8 +256,11 @@ def edit_inventory_item(item_id):
         # Обновляем количество и записываем изменение в историю
         new_quantity = form.quantity.data
         change_quantity = new_quantity - old_quantity
-        
-        item.update_quantity(change_quantity, "Обновление товара")
+        if change_quantity > 0:
+            item.update_quantity(change_quantity, "Обновление товара")
+        elif change_quantity < 0:
+            item.update_quantity(change_quantity, "Регулярная проверка запасов")
+            
         
         db.session.commit()
         flash('Товар обновлен!', 'success')
@@ -277,3 +285,46 @@ def statistics():
         supplier_counts[supplier_name] += item.quantity
 
     return render_template('statistics.html', orders_data=orders_data_list, supplier_counts=supplier_counts)
+
+@app.errorhandler(400)
+def bad_request(error):
+    return render_template('error_400.html'), 400
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error_500.html'), 500
+
+@app.route('/test_bad_request')
+def test_bad_request():
+    abort(400)
+    
+@app.route('/test_internal_error')
+def test_internal_error():
+    raise Exception("Это тестовая ошибка 500")  # Принудительно вызываем ошибку 500
+
+
+@app.route('/suppliers/edit/<int:supplier_id>', methods=['GET', 'POST'])
+@login_required
+def edit_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    form = SupplierForm(obj=supplier)  # Предполагается, что у вас есть форма SupplierForm
+
+    if form.validate_on_submit():
+        supplier.name = form.name.data
+        supplier.contact_person = form.contact_person.data
+        supplier.phone = form.phone.data
+        supplier.email = form.email.data
+        db.session.commit()
+        flash('Поставщик обновлен!', 'success')
+        return redirect(url_for('suppliers'))
+
+    return render_template('edit_supplier.html', form=form, supplier=supplier)
+
+@app.route('/suppliers/delete/<int:supplier_id>', methods=['POST'])
+@login_required
+def delete_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    db.session.delete(supplier)
+    db.session.commit()
+    flash('Поставщик удален!', 'success')
+    return redirect(url_for('suppliers'))

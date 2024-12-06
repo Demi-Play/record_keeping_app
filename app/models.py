@@ -61,6 +61,11 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     order_date = db.Column(db.DateTime, default=db.func.current_timestamp())
     status = db.Column(db.String(20), default='new')
+    item_id = db.Column(db.Integer, db.ForeignKey('inventory_item.id'))  # Связь с товаром
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))  # Связь с поставщиком
+
+    item = db.relationship('InventoryItem', backref='orders')  # Связь с товаром
+    supplier = db.relationship('Supplier', backref='orders')  # Связь с поставщиком
 
 class InventoryChangeHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

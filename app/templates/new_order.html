@@ -23,6 +23,16 @@
        {{ form.status(class='form-control') }}
    </div>
 
+   <div class="form-group">
+       {{ form.item_id.label }} 
+       {{ form.item_id(class='form-control') }}
+   </div>
+
+   <div class="form-group">
+       {{ form.supplier_id.label }} 
+       {{ form.supplier_id(class='form-control') }}
+   </div>
+
    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
    <a href="{{ url_for('orders') }}" class="btn btn-secondary">Назад к списку заказов</a>
 </form>
@@ -35,7 +45,6 @@
             autoclose: true,
             todayHighlight: true
         }).on('changeDate', function(e) {
-            // Обработка изменения даты
             const selectedDate = e.format(); // Получаем выбранную дату
             const timePicker = $('<input type="text" id="timePicker" class="form-control" placeholder="HH:mm:ss">');
             $(this).after(timePicker); // Добавляем поле для времени после поля даты

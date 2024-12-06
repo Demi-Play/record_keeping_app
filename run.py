@@ -56,10 +56,14 @@ def seed_database():
 
     # Создаем заказы
     orders = [
-        Order(user_id=users[i % len(users)].id,
-              order_date=datetime.now(),
-              status=['new','completed','canceled'][random.choice(range(3))]) for i in range(len(items))
-    ]
+    Order(
+        user_id=users[random.randint(0, len(users) - 1)].id,  # Случайный пользователь
+        order_date=datetime.now(),
+        status=random.choice(['new', 'completed', 'canceled']),  # Случайный статус
+        supplier_id=random.randint(1, len(suppliers)),  # Случайный поставщик (предполагается, что ID поставщиков начинаются с 1)
+        item_id=random.randint(1, len(items))  # Случайный товар (предполагается, что ID товаров начинаются с 1)
+    ) for _ in range(len(items))  # Генерируем столько заказов, сколько товаров
+]
 
     # Добавляем заказы в базу данных
     db.session.bulk_save_objects(orders)

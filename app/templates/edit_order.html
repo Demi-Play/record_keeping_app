@@ -18,9 +18,17 @@
    </div>
 
    <div class="form-group">
-       {{ form.status.label }} 
-       {{ form.status(class='form-control') }}
-   </div>
+    {{ form.status.label }} 
+    {{ form.status(class='form-control') }}
+</div>
+<div class="form-group">
+    {{ form.item_id.label }} 
+    {{ form.item_id(class='form-control') }}
+</div>
+<div class="form-group">
+    {{ form.supplier_id.label }} 
+    {{ form.supplier_id(class='form-control') }}
+</div>
 
    <button type="submit" class="btn btn-primary">{{ form.submit() }}</button>
    <a href="{{ url_for('orders') }}" class="btn btn-secondary">Назад к списку заказов</a>
