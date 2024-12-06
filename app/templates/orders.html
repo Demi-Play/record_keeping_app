@@ -16,7 +16,9 @@
            <th>Статус</th>
            <th>Товар</th>
            <th>Поставщик</th>
+{% if current_user.is_authenticated and current_user.role == 'moderator' %}
            <th>Действия</th>
+           {% endif %}
        </tr>
    </thead>
    <tbody>
@@ -28,11 +30,14 @@
                <td>{{ order.status }}</td>
                <td>{{ order.item.name }}</td>  <!-- Название товара -->
                <td>{{ order.supplier.name }}</td>  <!-- Имя поставщика -->
-               <td>
+{% if current_user.is_authenticated and current_user.role == 'moderator' %}
+<td>
+
                    <a href="{{ url_for('edit_order', order_id=order.id) }}" class="btn btn-warning">Редактировать</a>
                    <!-- Здесь можно добавить кнопку для удаления заказа -->
-               </td>
-           </tr>
+                </tr>
+                {% endif %}
+</td>
        {% endfor %}
    </tbody>
 </table>

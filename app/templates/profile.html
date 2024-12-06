@@ -6,6 +6,13 @@
 <h2>Профиль пользователя</h2>
 <p><strong>Имя:</strong> {{ user.first_name }} {{ user.last_name }}</p>
 <p><strong>Email:</strong> {{ user.email }}</p>
+{% if current_user.is_authenticated and current_user.role == 'moderator' %}
+<p><strong>Роль:</strong> moderator</p>
+{% elif current_user.is_authenticated and current_user.role == 'admin' %}
+<p><strong>Роль:</strong> admin</p>
+{% else %}
+<p><strong>Роль:</strong> client</p>
+{% endif %}
 <p><strong>Общее количество заказов:</strong> {{ total_orders }}</p>
 <p><strong>Общее количество поставщиков:</strong> {{ total_suppliers }}</p>
 
