@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}История изменений запасов{% endblock %}
+
+{% block content %}
+<h2>История изменений запасов</h2>
+
+<table class="table">
+   <thead>
+       <tr>
+           <th>ID товара</th>
+           <th>Дата изменения</th>
+           <th>Измененное количество</th>
+           <th>Причина изменения</th>
+       </tr>
+   </thead>
+   <tbody>
+       {% for change in history %}
+           <tr>
+               <td>{{ change.item_id }}</td>
+               <td>{{ change.change_date }}</td>
+               <td>{{ change.changed_quantity }}</td>
+               <td>{{ change.reason }}</td>
+           </tr>
+       {% endfor %}
+   </tbody>
+</table>
+
+<a href="{{ url_for('inventory') }}" class="btn btn-secondary">Назад к списку товаров</a>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<h2>Вход в систему</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.first_name.label }} 
+        {{ form.first_name(class='form-control', placeholder='Введите ваше имя') }}
+    </div>
+    <div class="form-group">
+        {{ form.last_name.label }} 
+        {{ form.last_name(class='form-control', placeholder='Введите вашу фамилию') }}
+    </div>
+    <div class="form-group">
+        {{ form.email.label(class='form-label') }} 
+        {{ form.email(class='form-control', placeholder='Введите ваш email') }}
+    </div>
+    <div class="form-group">
+        {{ form.password.label(class='form-label') }} 
+        {{ form.password(class='form-control', placeholder='Введите ваш пароль') }}
+    </div>
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+</form>
+
+<p>Есть аккаунт? <a href="{{ url_for('register') }}">Войдите здесь здесь!</a></p>
+{% endblock %}

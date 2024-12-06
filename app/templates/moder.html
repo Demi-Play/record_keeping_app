@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}Админка{% endblock %}
+
+{% block content %}
+<h2>Административная панель</h2>
+
+<h3>Добавить товар</h3>
+<form method="POST" action="{{ url_for('admin') }}">
+   {{ inventory_form.hidden_tag() }}
+   <div class="form-group">
+       {{ inventory_form.name.label }} 
+       {{ inventory_form.name(class='form-control', size=32) }}
+   </div>
+   <div class="form-group">
+       {{ inventory_form.quantity.label }} 
+       {{ inventory_form.quantity(class='form-control') }}
+   </div>
+   <div class="form-group">
+       {{ inventory_form.min_level.label }} 
+       {{ inventory_form.min_level(class='form-control') }}
+   </div>
+   <div class="form-group">
+       {{ inventory_form.max_level.label }} 
+       {{ inventory_form.max_level(class='form-control') }}
+   </div>
+   <div class="form-group">
+       {{ inventory_form.supplier_id.label }} 
+       {{ inventory_form.supplier_id(class='form-control') }}
+   </div>
+   <button type="submit" class="btn btn-primary">{{ inventory_form.submit() }}</button>
+</form>
+
+<h3>Добавить поставщика</h3>
+<form method="POST" action="{{ url_for('admin') }}">
+   {{ supplier_form.hidden_tag() }}
+   <div class="form-group">
+       {{ supplier_form.name.label }} 
+       {{ supplier_form.name(class='form-control', size=32) }}
+   </div>
+   <div class="form-group">
+       {{ supplier_form.contact_person.label }} 
+       {{ supplier_form.contact_person(class='form-control', size=32) }}
+   </div>
+   <div class="form-group">
+       {{ supplier_form.phone.label }} 
+       {{ supplier_form.phone(class='form-control', size=32) }}
+   </div>
+   <div class="form-group">
+       {{ supplier_form.email.label }} 
+       {{ supplier_form.email(class='form-control', size=32) }}
+   </div>
+   <button type="submit" class="btn btn-primary">{{ supplier_form.submit() }}</button>
+</form>
+
+{% endblock %}

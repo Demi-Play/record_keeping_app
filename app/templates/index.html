@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<div >
+    <h1 class='text-center'>Добро пожаловать на главную страницу!</h1>
+    <p class='text-center'>Это система учета запасов для вашего предприятия.</p>
+
+    
+
+
+
+{% if is_authenticated %}
+
+    <p><strong>Общее количество заказов:</strong> {{ total_orders }}</p>
+    <p><strong>Общее количество поставщиков:</strong> {{ total_suppliers }}</p>
+    
+    <canvas id="ordersChart" width="400" height="200"></canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctxOrders = document.getElementById('ordersChart').getContext('2d');
+        
+        // Подготовка данных для графика заказов
+        const ordersData = {{ orders_data | tojson | safe }};
+        
+        const orderCounts = {};
+        ordersData.forEach(order => {
+            const date = order[0]; // Дата заказа
+            const status = order[1];
+            orderCounts[date] = orderCounts[date] || {};
+            orderCounts[date][status] = (orderCounts[date][status] || 0) + 1;
+        });
+
+        const labels = Object.keys(orderCounts);
+        const dataNew = labels.map(date => orderCounts[date]['new'] || 0);
+        const dataCompleted = labels.map(date => orderCounts[date]['completed'] || 0);
+        const dataCanceled = labels.map(date => orderCounts[date]['canceled'] || 0);
+
+        const ordersChart = new Chart(ctxOrders, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Новые заказы',
+                        data: dataNew,
+                        backgroundColor: '#FF6384',
+                    },
+                    {
+                        label: 'Завершенные заказы',
+                        data: dataCompleted,
+                        backgroundColor: '#36A2EB',
+                    },
+                    {
+                        label: 'Отмененные заказы',
+                        data: dataCanceled,
+                        backgroundColor: '#FFCE56',
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество заказов'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% else %}
+    <h3>Статистика для вашего предприятия</h3>
+    
+    <canvas id="fakeOrdersChart" width="400" height="200"></canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctxFakeOrders = document.getElementById('fakeOrdersChart').getContext('2d');
+        
+        // Фейковые данные для графика заказов
+        const fakeOrdersData = {{ orders_data | tojson | safe }};
+        
+        const fakeOrderCounts = {};
+        fakeOrdersData.forEach(order => {
+            const date = order[0]; // Дата заказа
+            const status = order[1];
+            fakeOrderCounts[date] = fakeOrderCounts[date] || {};
+            fakeOrderCounts[date][status] = (fakeOrderCounts[date][status] || 0) + 1;
+        });
+
+        const fakeLabels = Object.keys(fakeOrderCounts);
+        const fakeDataNew = fakeLabels.map(date => fakeOrderCounts[date]['new'] || 0);
+        const fakeDataCompleted = fakeLabels.map(date => fakeOrderCounts[date]['completed'] || 0);
+        const fakeDataCanceled = fakeLabels.map(date => fakeOrderCounts[date]['canceled'] || 0);
+
+        const fakeOrdersChart = new Chart(ctxFakeOrders, {
+            type: 'bar',
+            data: {
+                labels: fakeLabels,
+                datasets: [
+                    {
+                        label: 'Новые заказы (фейковые)',
+                        data: fakeDataNew,
+                        backgroundColor: '#FF6384',
+                    },
+                    {
+                        label: 'Завершенные заказы (фейковые)',
+                        data: fakeDataCompleted,
+                        backgroundColor: '#36A2EB',
+                    },
+                    {
+                        label: 'Отмененные заказы (фейковые)',
+                        data: fakeDataCanceled,
+                        backgroundColor: '#FFCE56',
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество заказов'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endif %}
+<br>
+<div class='text-center'>
+{% if current_user.is_authenticated %}
+        <p><a href="{{ url_for('profile') }}" class="btn btn-primary ">Перейти в профиль</a></p>
+    {% else %}
+        <p><a href="{{ url_for('login') }}" class="btn btn-primary">Присоединиться</a></p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

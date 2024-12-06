@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h2>Статистика заказов и поставок</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Статистика заказов</h3>
+        <canvas id="ordersChart" width="400" height="200"></canvas>
+    </div>
+    <div class="col-md-6">
+        <h3>Статистика по поставщикам</h3>
+        <canvas id="suppliersChart" width="400" height="200"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctxOrders = document.getElementById('ordersChart').getContext('2d');
+    
+    // Подготовка данных для графика заказов
+    const ordersData = {{ orders_data | tojson | safe }};
+    
+    const orderCounts = {};
+    ordersData.forEach(order => {
+        const date = order[0]; // Дата заказа
+        const status = order[1];
+        orderCounts[date] = orderCounts[date] || {};
+        orderCounts[date][status] = (orderCounts[date][status] || 0) + 1;
+    });
+
+    const labels = Object.keys(orderCounts);
+    const dataNew = labels.map(date => orderCounts[date]['new'] || 0);
+    const dataCompleted = labels.map(date => orderCounts[date]['completed'] || 0);
+    const dataCanceled = labels.map(date => orderCounts[date]['canceled'] || 0);
+
+    const ordersChart = new Chart(ctxOrders, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Новые заказы',
+                    data: dataNew,
+                    backgroundColor: '#FF6384',
+                },
+                {
+                    label: 'Завершенные заказы',
+                    data: dataCompleted,
+                    backgroundColor: '#36A2EB',
+                },
+                {
+                    label: 'Отмененные заказы',
+                    data: dataCanceled,
+                    backgroundColor: '#FFCE56',
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Количество заказов'
+                    }
+                }
+            }
+        }
+    });
+
+    const ctxSuppliers = document.getElementById('suppliersChart').getContext('2d');
+    
+    // Подготовка данных для графика поставщиков
+    const supplierCounts = {{ supplier_counts | tojson | safe }};
+    
+    const suppliersChart = new Chart(ctxSuppliers, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(supplierCounts),
+            datasets: [{
+                label: 'Количество поставок от каждого поставщика',
+                data: Object.values(supplierCounts),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF9F40'],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Статистика по поставщикам'
+                }
+            }
+        }
+    });
+</script>
+
+<a href="{{ url_for('profile') }}" class="btn btn-secondary">Назад в профиль</a>
+{% endblock %}
