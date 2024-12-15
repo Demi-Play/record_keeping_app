@@ -13,6 +13,23 @@
 {% else %}
 <p><strong>Роль:</strong> client</p>
 {% endif %}
+<h3>Изменение пароля</h3>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.current_password.label(class="form-control-label") }}
+        {{ form.current_password(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.new_password.label(class="form-control-label") }}
+        {{ form.new_password(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.confirm_password.label(class="form-control-label") }}
+        {{ form.confirm_password(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">Изменить пароль</button>
+</form>
 <p><strong>Общее количество заказов:</strong> {{ total_orders }}</p>
 <p><strong>Общее количество поставщиков:</strong> {{ total_suppliers }}</p>
 

@@ -1,7 +1,7 @@
 from flask import abort, render_template, redirect, url_for, flash, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from app import app, db
-from app.forms import OrderForm, RegistrationForm, LoginForm, InventoryItemForm, SupplierForm
+from app.forms import ChangePasswordForm, OrderForm, RegistrationForm, LoginForm, InventoryItemForm, SupplierForm
 from app.models import InventoryItem, Supplier, User, Order, InventoryChangeHistory
 
 @app.route('/')
@@ -75,9 +75,25 @@ def logout():
     flash('Вы вышли из аккаунта.', 'success')
     return redirect(url_for('index'))
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    form = ChangePasswordForm()
+    
+    if form.validate_on_submit():
+        if not current_user.check_password(form.current_password.data):
+            flash('Неверный текущий пароль.', 'danger')
+            return redirect(url_for('profile'))
+        
+        if form.new_password.data != form.confirm_password.data:
+            flash('Новый пароль и подтверждение не совпадают.', 'danger')
+            return redirect(url_for('profile'))
+        
+        current_user.set_password(form.new_password.data)
+        db.session.commit()
+        flash('Пароль успешно изменен.', 'success')
+        return redirect(url_for('profile'))
+
     # Получаем статистику по заказам
     total_orders = Order.query.filter_by(user_id=current_user.id).count()
     total_suppliers = Supplier.query.count()
@@ -100,7 +116,8 @@ def profile():
                            total_orders=total_orders, 
                            total_suppliers=total_suppliers,
                            orders_data=orders_data_list,
-                           supplier_counts=supplier_counts)
+                           supplier_counts=supplier_counts,
+                           form=form)  # Передаем форму в шаблон
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required

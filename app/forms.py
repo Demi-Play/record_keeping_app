@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms import DateTimeField, HiddenField, SelectField, StringField, PasswordField, IntegerField, SubmitField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Email, Length, EqualTo
 from app.models import InventoryItem, Supplier, User
 
 class RegistrationForm(FlaskForm):
@@ -15,6 +15,12 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     submit = SubmitField('Войти')
+    
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('Текущий пароль', validators=[DataRequired()])
+    new_password = PasswordField('Новый пароль', validators=[DataRequired()])
+    confirm_password = PasswordField('Подтверждение пароля', validators=[DataRequired(), EqualTo('new_password', message='Пароли не совпадают')])
+    submit = SubmitField('Изменить пароль')
 
 class InventoryItemForm(FlaskForm):
     name = StringField('Наименование товара', validators=[DataRequired()])
